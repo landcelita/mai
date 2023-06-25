@@ -1,4 +1,4 @@
-name: Deploy Cloud Funcstions
+name: Deploy Cloud Functions
 
 on:
   workflow_dispatch:
@@ -15,8 +15,8 @@ jobs:
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@master
       with:
-        project_id: my-project-id
-        service_account_email: my-ci-account@my-project-id.iam.gserviceaccount.com
+        project_id: maimai-log
+        service_account_email: my-ci-account@maimai-log.iam.gserviceaccount.com
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
 
