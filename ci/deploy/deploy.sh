@@ -1,4 +1,4 @@
-gcloud functions deploy go-http-function \                                                                    
+gcloud functions deploy go-http-function \
 --gen2 \
 --runtime=go118 \
 --region=asia-northeast1 \
