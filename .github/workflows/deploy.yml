@@ -22,3 +22,5 @@ jobs:
 
     - name: Deploy Functions
       run: sh ci/deploy/deploy.sh
+      env:
+        GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
