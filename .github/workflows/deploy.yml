@@ -9,19 +9,33 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     steps:
-    - uses: actions/checkout@v2
-    
-    - name: 'Set up Cloud SDK'
-      uses: 'google-github-actions/setup-gcloud@v1'
-    
+    # actions/checkout MUST come before auth
+    - uses: 'actions/checkout@v3'
+    - run: ls
+
     - id: 'auth'
+      name: 'Authenticate to Google Cloud'
       uses: 'google-github-actions/auth@v1'
       with:
-        service_account: 'my-ci-account@maimai-log.iam.gserviceaccount.com'
-        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+        workload_identity_provider: 'projects/787243349388/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+        service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
+        token_format: 'access_token'
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
+      with:
+        version: '>= 363.0.0'
+    - name: 'Use gcloud CLI'
+      run: 'gcloud info'
 
-    - name: Deploy Functions
-      run: sh ci/deploy/deploy.sh
-      env:
-        GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+    - id: 'deploy'
+      uses: 'google-github-actions/deploy-cloud-functions@v1'
+      with:
+        name: 'go-http-function'
+    
+    - name: 'Use to deploy a cloud function gen 2'
+      run: 'gcloud functions deploy go-http-function --gen2 --runtime=go118 --region=asia-northeast1 --source=. --trigger-http --allow-unauthenticated --entry-point=HelloGet --memory=256MB --timeout=60s'
